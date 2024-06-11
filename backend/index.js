@@ -1,27 +1,37 @@
-import express from 'express'
-import dotenv from 'dotenv'
-import mongoose from 'mongoose'
-import cors from 'cors'
-import cookieParser from 'cookie-parser'
+import express from 'express';
+import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import tourRoute from './routes/tours.js';
 
-dotenv.config()
-const app = express()
-const port = process.env.PORT  || 8000
+dotenv.config();
+const app = express();
+const port = process.env.PORT || 8000;
 
-//database connection
-const connect = async()=>{
+// Database connection
+const connect = async () => {
     try {
-
-    }catch (err){
-        
+        await mongoose.connect(process.env.MONGO_URI, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        });
+        console.log('Connected to MongoDB');
+    } catch (err) {
+        console.error('Failed to connect to MongoDB', err);
+        process.exit(1); // Exit process with failure
     }
-}
+};
 
-// middleware
-app.use(express.json())
-app.use(cors())
-app.use(cookieParser())
+// Connect to the database
+connect();
 
-app.listen(port, ()=>{
-    console.log('server listening on port', port);
-})
+// Middleware
+app.use(express.json());
+app.use(cors());
+app.use(cookieParser());
+app.use('/tours', tourRoute )
+
+app.listen(port, () => {
+    console.log('Server listening on port', port);
+});
